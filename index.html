@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown Glitch</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #000;
+      color: #fff;
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #countdown {
+      font-size: 5rem;
+      font-weight: bold;
+      color: red;
+      animation: flash 0.5s infinite;
+    }
+
+    @keyframes flash {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="countdown">60</div>
+
+  <audio id="creepysound" src="creepy.mp3" preload="auto"></audio>
+
+  <script>
+    let timeLeft = 60;
+    const countdownEl = document.getElementById('countdown');
+    const sound = document.getElementById('creepysound');
+
+    const timer = setInterval(() => {
+      timeLeft--;
+      countdownEl.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        startMatrix();
+      }
+    }, 1000);
+
+    function startMatrix() {
+      // Try to autoplay sound
+      sound.loop = true;
+      sound.play().catch(() => {
+        countdownEl.textContent = "Click to begin";
+        countdownEl.style.cursor = "pointer";
+        countdownEl.onclick = () => {
+          sound.play();
+          countdownEl.onclick = null;
+          beginMatrix();
+        };
+        return;
+      });
+
+      beginMatrix();
+    }
+
+    function beginMatrix() {
+      document.body.innerHTML = ""; // Clear screen
+
+      // Create canvas
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      document.body.appendChild(canvas);
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const fontSize = 16;
+      const columns = Math.floor(canvas.width / fontSize);
+
+      // Each column has a "drop" position
+      const drops = Array(columns).fill(0);
+
+      function draw() {
+        // Fade effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#fff";
+        ctx.font = fontSize + "px monospace";
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = Math.random() > 0.5 ? "1" : "0";
+
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+          // Reset drop randomly
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+
+          drops[i]++;
+        }
+      }
+
+      setInterval(draw, 50);
+    }
+  </script>
+</body>
+</html>
